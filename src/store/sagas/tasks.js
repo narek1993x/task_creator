@@ -7,17 +7,18 @@ import { encodeQuery, sortQuery } from '../../helpers/encodeQuery'
 
 const API = 'https://uxcandy.com/~shapoval/test-task-backend/'
 
-export function* fetchListSaga(action) {
+export function* fetchListSaga({page, sortByAZ, sortField}) {
   yield put(actions.fetchListStart())
   try {
+    const sort_direction = sortByAZ ? 'asc' : 'desc'
     const response = yield axios({
       method: 'get',
       url: API,
       params: {
         developer: 'Developer77',
-        page: action.page,
-        sort_direction: action.sortByAZ,
-        sort_field: action.sortField
+        page: page,
+        sort_direction,
+        sort_field: sortField
 
       }
     })

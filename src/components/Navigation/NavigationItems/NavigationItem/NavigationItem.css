@@ -1,0 +1,20 @@
+.navigationItem {
+  margin: 10px 0;
+  box-sizing: border-box;
+  width: 75px;
+  display: block;
+}
+
+.navigationItem a {
+  color: black;
+  text-decoration: none;
+  width: inherit;
+  box-sizing: border-box;
+  display: block;
+}
+
+.navigationItem a:hover,
+.navigationItem a:active,
+.navigationItem a.active {
+  color: #40A4C8;
+}

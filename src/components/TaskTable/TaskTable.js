@@ -15,8 +15,8 @@ class TaskTable extends Component {
     isEdit: false,
     editableRow: {},
     page: 1,
-    sortByAZ: 'asc',
-    pageSize: 3
+    pageSize: 3,
+    sortByAZ: true
   }
 
   componentDidMount = () => {
@@ -63,13 +63,9 @@ class TaskTable extends Component {
   }
 
   sortAZ = () => {
-    let sortByAZ
-    if (this.state.sortByAZ === 'asc') {
-      sortByAZ = 'desc'
-    } else {
-      sortByAZ = 'asc'
-    }
-    this.setState({sortByAZ}, this.fetchList)
+    this.setState(prevState => {
+      return {sortByAZ: !prevState.sortByAZ}
+    }, this.fetchList)
   }
 
   callSortAction = menu => {
@@ -88,12 +84,11 @@ class TaskTable extends Component {
 
   getTableData = () => {
     const { fetching, taskList: { tasks, total_task_count }} = this.props
-    const { sortByAZ } = this.state
 
     const menu = (
       <Menu className='sort-menu' onClick={this.callSortAction}>
         <Menu.Item key='a-z'>
-          {sortByAZ === 'asc' ? 'Sort by Z-A' : 'Sort by A-Z'}
+          {this.state.sortByAZ ? 'Sort by Z-A' : 'Sort by A-Z'}
         </Menu.Item>
         <SubMenu className='sort-sub-menu' key='sortField' title='Sort Filed'>
           <Menu.Item key='id'> By Id</Menu.Item>
@@ -139,7 +134,7 @@ class TaskTable extends Component {
       title: '',
       key: 'edit',
       render: (value, row) => (
-        <div>
+        this.props.isAuthentiacted && <div>
           <Icon type='edit' className='edit-icon' onClick={() => this.handleEditTaskOpen(row)} />
         </div>
       )
@@ -191,7 +186,6 @@ class TaskTable extends Component {
             editTask={this.handleEditTask}
             closeModal={this.handleModalClose} />
         )}
-
       </div>
     )
   }
@@ -199,6 +193,7 @@ class TaskTable extends Component {
 
 const mapStateToProps = state => ({
   taskList: state.tasks.list.asMutable({deep: true}),
+  isAuthentiacted: state.auth.auth !== null,
   fetching: state.tasks.fetching
 })
 

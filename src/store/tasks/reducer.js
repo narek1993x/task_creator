@@ -4,6 +4,7 @@ import * as types from './actionTypes'
 const initialState = Immutable({
   fetching: false,
   list: [],
+  auth: null
 })
 
 const reducer = (state = initialState, action) => {
