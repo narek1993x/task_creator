@@ -1,0 +1,48 @@
+table th{
+  background: #babbbb !important
+}
+
+table tr {
+  background: white !important;
+}
+
+table th:first-child{
+  width: 1px;
+}
+
+table tr:first-child {
+  width: 1px;
+}
+
+.create-button {
+  float: right;
+}
+
+.edit-icon {
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.custom-filter-dropdown {
+  padding: 2px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
+}
+
+.sort-menu {
+  border: none;
+  width: inherit;
+}
+
+.sort-menu li, .sort-sub-menu li {
+  display: flex;
+  align-items: center;
+  width: 120px;
+  height: 25px !important;
+  list-style-type: none;
+}
+
+.sort-menu div {
+  width: inherit;
+}
