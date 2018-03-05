@@ -34,8 +34,8 @@ export function createTaskError(error) {
 }
 
 
-export function editTask(params, id) {
-  return { type: types.EDIT_TASK, params, id }
+export function editTask(values, id) {
+  return { type: types.EDIT_TASK, values, id }
 }
 
 export function editTaskStart() {

@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Input, Form, Modal, Upload, Icon } from 'antd'
+import { Input, Form, Modal, Upload, Icon, message } from 'antd'
 
+const FILE_TYPES = ['JPEG', 'JPG', 'GIF', 'PNG']
 class AddTaskModal extends Component {
   state = {
     previewVisible: false,
     previewImage: '',
     fileList: [],
     requiredMessage: '',
+    requiredStatusMessage: '',
   }
 
   componentWillMount = () => {
@@ -29,17 +31,18 @@ class AddTaskModal extends Component {
   }
 
   onOk = () => {
-    this.props.form.validateFields((err, values) => {
+    const { form, editableRow, addTask, editTask, edit } = this.props
+    form.validateFields((err, values) => {
       if (err) return
-      if (this.props.edit) {
-        const { id } = this.props.editableRow
-        const editValues = {
+      if (edit) {
+        const { id } = editableRow
+        const newValues = {
           text: values.text,
-          status: values.status
+          status: parseInt(values.status, 10)
         }
-        this.props.editTask(editValues, id)
+        editTask(newValues, id)
       } else {
-        this.props.addTask(values)
+        addTask(values)
       }
       this.onOkFinish()
     })
@@ -63,6 +66,16 @@ class AddTaskModal extends Component {
     this.setState({ fileList })
   }
 
+  handleBeforeUpload = file => {
+    const types = file.type === 'image/jpeg' ||
+                  file.type === 'image/gif' ||
+                  file.type === 'image/png'
+    if (!types) {
+      message.error(`You can only upload ${FILE_TYPES.join(', ')} files!`)
+    }
+    return types
+  }
+
   handlePreview = (file) => {
     this.setState({
       previewImage: file.url || file.thumbUrl,
@@ -73,14 +86,20 @@ class AddTaskModal extends Component {
   handleCancel = () => this.setState({ previewVisible: false })
 
   validateEmail = (rule, value, callback) => {
-    let error = !value ? 'Name is required' : !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ? 'This email is not valid' : ''
+    let error = !value ? 'Email is required' : !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ? 'This email is not valid' : ''
+    this.setState({ requiredMessage: error })
+    return error ? callback(error) : callback()
+  }
+
+  validateStatus = (rule, value, callback) => {
+    let error = !value ? 'Status is required' : value < 0 || value > 10 ? 'Status must be between 0 to 10' : ''
     this.setState({ requiredMessage: error })
     return error ? callback(error) : callback()
   }
 
   render () {
     const { edit, editableRow } = this.props
-    const { requiredMessage, previewVisible, previewImage, fileList } = this.state
+    const { requiredMessage, requiredStatusMessage, previewVisible, previewImage, fileList } = this.state
     const uploadButton = (
       <div>
         <Icon type='plus' />
@@ -116,8 +135,8 @@ class AddTaskModal extends Component {
           </Form.Item>
           {edit && <Form.Item label='Status'>
             {this.props.form.getFieldDecorator('status', {
-              rules: [{ required: true, message: 'Status can not be empty' }],
-              initialValue: editableRow && editableRow.status
+              rules: [{ required: true, message: requiredStatusMessage, validator: this.validateStatus }],
+              initialValue: editableRow && editableRow.status ? editableRow.status : ''
             })(
               <Input placeholder='Status' type='number' />
             )}
@@ -137,11 +156,12 @@ class AddTaskModal extends Component {
               })(
                 <div>
                   <Upload
-                    action='//jsonplaceholder.typicode.com/posts/'
+                    action='//jsonplaceholder.typicode.com/post/'
                     listType='picture-card'
                     fileList={fileList}
                     disabled={edit}
                     onPreview={this.handlePreview}
+                    beforeUpload={this.handleBeforeUpload}
                     onChange={this.handleUploadChange} >
                     {fileList.length ? null : uploadButton}
                   </Upload>

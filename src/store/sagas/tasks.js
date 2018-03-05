@@ -73,7 +73,6 @@ export function* createTaskSaga({params}) {
 export function* editTaskSaga({ values, id }) {
   yield put(actions.editTaskStart())
   try {
-
     const query = []
 
     for (let key in values) {
@@ -84,13 +83,21 @@ export function* editTaskSaga({ values, id }) {
     const sortedQuery = sortQuery(query).join('&')
     const queryWithToken = `${sortedQuery}&token=beejee`
 
+    const form = new FormData()
+    form.append('text', values.text)
+    form.append('status', values.status)
+    form.append('token', 'beejee')
+    form.append('signature', md5(queryWithToken))
+
     const response = yield axios({
       method: 'post',
-      url: `${API}edit/${id}/`,
-      data: values,
+      url: `${API}edit/${id}`,
+      data: form,
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
       params: {
-        developer: 'Developer77',
-        signature: md5(queryWithToken)
+        developer: 'Developer77'
       }
     })
     const { data: message } = response

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Button, Table, Row, Col, Icon, Menu } from 'antd'
+import { Button, Table, Row, Col, Icon, Menu, Tooltip} from 'antd'
 import AddTaskModal from '../AddTaskModal'
 import { fetchList, createTask, editTask } from '../../store/tasks/actions'
 
@@ -125,7 +125,11 @@ class TaskTable extends Component {
     }, {
       title: 'Text',
       dataIndex: 'text',
-      key: 'text',
+      render: (text) => (
+        <Tooltip placement='top' title={text}>
+          {text.substring(0, Math.min(text.length, 20)) + (text.length > 20 ? '...' : '') }
+        </Tooltip>
+      )
     }, {
       title: 'Status',
       dataIndex: 'status',
