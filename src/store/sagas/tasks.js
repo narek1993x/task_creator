@@ -7,7 +7,7 @@ import { encodeQuery, sortQuery } from '../../helpers/encodeQuery'
 
 const API = 'https://uxcandy.com/~shapoval/test-task-backend/'
 
-export function* fetchListSaga({page, sortByAZ, sortField}) {
+export function* fetchListSaga({page = 1, sortByAZ = true, sortField}) {
   yield put(actions.fetchListStart())
   try {
     const sort_direction = sortByAZ ? 'asc' : 'desc'
@@ -35,7 +35,7 @@ export function* fetchListSaga({page, sortByAZ, sortField}) {
   }
 }
 
-export function* createTaskSaga({params}) {
+export function* createTaskSaga({params, page, sortByAZ, sortField}) {
   yield put(actions.createTaskStart())
   try {
     const { username, email, text, image } = params
@@ -59,7 +59,7 @@ export function* createTaskSaga({params}) {
     const { data: message } = response
     if (message.status === 'ok') {
       yield put(actions.createTaskSuccess(message.message))
-      yield put(actions.fetchList())
+      yield put(actions.fetchList(page, sortByAZ, sortField))
     }
     else {
       throw new Error(message.message)
@@ -70,7 +70,7 @@ export function* createTaskSaga({params}) {
   }
 }
 
-export function* editTaskSaga({ values, id }) {
+export function* editTaskSaga({ values, id, page, sortByAZ, sortField }) {
   yield put(actions.editTaskStart())
   try {
     const query = []
@@ -103,14 +103,13 @@ export function* editTaskSaga({ values, id }) {
     const { data: message } = response
     if (message.status === 'ok') {
       yield put(actions.editTaskSuccess(message.message))
-      yield put(actions.fetchList())
+      yield put(actions.fetchList(page, sortByAZ, sortField))
     }
     else {
       throw new Error(message.message)
     }
 
   } catch (err) {
-    console.log('ERR: ', err)
     yield put(actions.editTaskError(err))
   }
 }

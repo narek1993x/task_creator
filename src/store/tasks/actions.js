@@ -17,8 +17,8 @@ export function fetchListError (error) {
 }
 
 
-export function createTask (params) {
-  return { type: types.CREATE_TASK, params }
+export function createTask(params, page, sortByAZ, sortField) {
+  return { type: types.CREATE_TASK, params, page, sortByAZ, sortField }
 }
 
 export function createTaskStart() {
@@ -33,9 +33,8 @@ export function createTaskError(error) {
   return { type: types.CREATE_TASK_ERROR, payload: { error } }
 }
 
-
-export function editTask(values, id) {
-  return { type: types.EDIT_TASK, values, id }
+export function editTask(values, id, page, sortByAZ, sortField) {
+  return { type: types.EDIT_TASK, values, id, page, sortByAZ, sortField }
 }
 
 export function editTaskStart() {

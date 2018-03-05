@@ -16,7 +16,8 @@ class TaskTable extends Component {
     editableRow: {},
     page: 1,
     pageSize: 3,
-    sortByAZ: true
+    sortByAZ: true,
+    sortField: ''
   }
 
   componentDidMount = () => {
@@ -31,11 +32,13 @@ class TaskTable extends Component {
   handleModal = () => this.setState({showTaskModal: true})
 
   handleAddTask = params => {
-    this.props.dispatch(createTask(params))
+    const { page, sortByAZ, sortField } = this.state
+    this.props.dispatch(createTask(params, page, sortByAZ, sortField))
   }
 
   handleEditTask = (params, id) => {
-    this.props.dispatch(editTask(params, id))
+    const { page, sortByAZ, sortField } = this.state
+    this.props.dispatch(editTask(params, id, page, sortByAZ, sortField))
   }
 
   handleEditTaskOpen = row => {

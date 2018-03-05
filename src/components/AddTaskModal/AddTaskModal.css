@@ -1,0 +1,21 @@
+.preview-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.preview-modal span {
+  color: #40A4C8;
+  margin-left: 5px;
+  font-weight: bold;
+}
+
+.preview-modal div {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  min-height: 50px;
+  margin-bottom: 2px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+}

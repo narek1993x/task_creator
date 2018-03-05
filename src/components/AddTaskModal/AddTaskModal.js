@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Input, Form, Modal, Upload, Icon, message } from 'antd'
+import { Button, Input, Form, Modal, Upload, Icon, Select, message } from 'antd'
+
+import './AddTaskModal.css'
 
 const FILE_TYPES = ['JPEG', 'JPG', 'GIF', 'PNG']
 class AddTaskModal extends Component {
   state = {
     previewVisible: false,
     previewImage: '',
+    imgSrc: '',
     fileList: [],
     requiredMessage: '',
     requiredStatusMessage: '',
@@ -24,6 +27,7 @@ class AddTaskModal extends Component {
       }
       this.setState(prevState => {
         return {
+          imgSrc: imageFile.url,
           fileList: prevState.fileList.concat(imageFile)
         }
       })
@@ -38,7 +42,7 @@ class AddTaskModal extends Component {
         const { id } = editableRow
         const newValues = {
           text: values.text,
-          status: parseInt(values.status, 10)
+          status: values.status
         }
         editTask(newValues, id)
       } else {
@@ -57,13 +61,17 @@ class AddTaskModal extends Component {
     this.props.closeModal()
     this.props.form.resetFields()
   }
+  
+  statusChangeHandle = status => {
+    this.props.form.setFieldsValue({status})
+  }
 
   handleUploadChange = ({ fileList }) => {
     if (fileList && fileList[0] && fileList[0].originFileObj) {
       const { originFileObj } = fileList[0]
       this.props.form.setFieldsValue({image: originFileObj})
     }
-    this.setState({ fileList })
+    this.setState({ fileList, imgSrc: fileList[0].thumbUrl })
   }
 
   handleBeforeUpload = file => {
@@ -83,6 +91,25 @@ class AddTaskModal extends Component {
     })
   }
 
+  showPreview = () => {
+    const { imgSrc } = this.state
+    const fields = ['username', 'email', 'text']
+    const { username, email, text } = this.props.form.getFieldsValue(fields)
+
+    return Modal.confirm({
+      title: 'PREVIEW',
+      width: 520,
+      content: (
+        <div className='preview-modal'>
+          <div>Username: <span>{username}</span></div>
+          <div>Email: <span>{email}</span></div>
+          <div>Text: <span>{text}</span></div>
+          <div>Image: {imgSrc && <img src={imgSrc} alt='img' width='100' heigth='100' />}</div>  
+        </div>
+      )
+    })
+  }
+
   handleCancel = () => this.setState({ previewVisible: false })
 
   validateEmail = (rule, value, callback) => {
@@ -99,6 +126,8 @@ class AddTaskModal extends Component {
 
   render () {
     const { edit, editableRow } = this.props
+    const statuses = [0, 10]
+
     const { requiredMessage, requiredStatusMessage, previewVisible, previewImage, fileList } = this.state
     const uploadButton = (
       <div>
@@ -111,10 +140,19 @@ class AddTaskModal extends Component {
       <Modal
         onCancel={this.onCancel}
         title={edit ? 'Edit task' : 'Add new task'}
-        okText={edit ? 'EDIT' : 'SAVE'}
-        cancelText='Cancel'
-        onOk={this.onOk}
         visible
+        maskClosable={false}
+        footer={[
+          <Button style={{float: 'left'}} key='preview' type='ghost' onClick={this.showPreview}>
+            PREVIEW
+          </Button>,
+          <Button key='back' type='ghost' onClick={this.onCancel}>
+            CANCEL
+          </Button>,
+          <Button key='submit' type='primary' onClick={this.onOk}>
+            {edit ? 'EDIT' : 'SAVE'}
+          </Button>
+        ]}
         >
         <Form autoComplete='off' layout='vertical' className='modal-form'>
           <Form.Item label='User Name'>
@@ -138,7 +176,11 @@ class AddTaskModal extends Component {
               rules: [{ required: true, message: requiredStatusMessage, validator: this.validateStatus }],
               initialValue: editableRow && editableRow.status ? editableRow.status : ''
             })(
-              <Input placeholder='Status' type='number' />
+              <Select
+                placeholder='Choose status'
+                onChange={this.statusChangeHandle}>
+                {statuses.map((option, i) => <Select.Option key={i}>{option}</Select.Option>)}
+              </Select>
             )}
           </Form.Item>}
           <Form.Item label='Text'>
